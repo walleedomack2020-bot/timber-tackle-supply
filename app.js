@@ -148,7 +148,8 @@ async function configurePaypal() {
     if (!response.ok) throw new Error("PayPal settings could not be loaded.");
     const config = await response.json();
     if (!config.enabled) {
-      setCheckoutStatus(config.missingDetails?.length
+      const policiesMissing = config.missingDetails?.some((detail) => detail.startsWith("STORE_") || detail === "SELLER_COMPLIANCE_CONFIRMATION");
+      setCheckoutStatus(policiesMissing
         ? "Checkout is unavailable until the owner publishes a legal business name, mailing address, support email, shipping and return policies, tax disclosure, and compliance confirmation."
         : "PayPal is not connected yet. The owner must add PayPal app credentials before taking payments.", true);
       return;

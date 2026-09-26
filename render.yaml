@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: starter
     region: ohio
-    buildCommand: node --check server.js && node --check admin.js && node --check app.js && node --check install.js && node --check legal.js
+    buildCommand: node --check server.js && node --check admin.js && node --check app.js && node --check install.js && node --check legal.js && node --check functions/_utils/paypal.js && node --check functions/api/paypal/config.js && node --check functions/api/paypal/orders.js && node --check "functions/api/paypal/orders/[orderId]/capture.js"
     startCommand: node server.js
     healthCheckPath: /api/session
     disk:

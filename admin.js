@@ -54,12 +54,41 @@ function showDashboard(ownerName) {
   dashboard.classList.remove("admin-hidden");
   document.querySelector("#owner-label").textContent = ownerName;
   loadOwnerProducts();
-  if (!useSupabase) loadSellerSettings();
+  loadSellerSettings();
 }
 
 async function loadSellerSettings() {
   try {
-    const settings = await localRequest("/api/admin/legal-settings");
+    let settings;
+    if (useSupabase) {
+      const [{ data, error }, configResponse] = await Promise.all([
+        client.from("store_legal_settings")
+          .select("business_name,support_email,postal_address,shipping_policy,returns_policy,tax_disclosure,policy_date,compliance_confirmed")
+          .eq("id", 1)
+          .maybeSingle(),
+        fetch("/api/paypal/config", { cache: "no-store" }),
+      ]);
+      if (error) throw error;
+      if (!configResponse.ok) throw new Error("Could not check PayPal configuration.");
+      const paypal = await configResponse.json();
+      settings = {
+        businessName: data?.business_name ?? "",
+        supportEmail: data?.support_email ?? "",
+        postalAddress: data?.postal_address ?? "",
+        shippingPolicy: data?.shipping_policy ?? "",
+        returnsPolicy: data?.returns_policy ?? "",
+        taxDisclosure: data?.tax_disclosure ?? "",
+        policyDate: data?.policy_date ?? "",
+        complianceConfirmed: data?.compliance_confirmed ?? false,
+        missingDetails: paypal.missingDetails,
+      };
+      sellerPaypalStatus.textContent = paypal.enabled
+        ? `PayPal is ready in ${paypal.environment} mode.`
+        : `PayPal checkout is disabled: ${paypal.missingDetails.join(", ")}. Manage credentials in Cloudflare Pages settings; never paste secrets here.`;
+    } else {
+      settings = await localRequest("/api/admin/legal-settings");
+      sellerPaypalStatus.textContent = `PayPal Client ID: ${settings.paypalClientIdConfigured ? "configured" : "missing"} · PayPal Secret: ${settings.paypalClientSecretConfigured ? "configured" : "missing"}. Credentials are managed in the server environment, not in this form.`;
+    }
     document.querySelector("#legal-business-name").value = settings.businessName;
     document.querySelector("#legal-support-email").value = settings.supportEmail;
     document.querySelector("#legal-postal-address").value = settings.postalAddress;
@@ -68,7 +97,6 @@ async function loadSellerSettings() {
     document.querySelector("#legal-tax-disclosure").value = settings.taxDisclosure;
     document.querySelector("#legal-policy-date").value = settings.policyDate;
     document.querySelector("#legal-compliance-confirmed").checked = settings.complianceConfirmed;
-    sellerPaypalStatus.textContent = `PayPal Client ID: ${settings.paypalClientIdConfigured ? "configured" : "missing"} · PayPal Secret: ${settings.paypalClientSecretConfigured ? "configured" : "missing"}. Credentials are managed in the server environment, not in this form.`;
   } catch (error) {
     setStatus(sellerSettingsStatus, `Could not load seller settings: ${error.message}`, true);
   }
@@ -90,7 +118,29 @@ sellerSettingsForm.addEventListener("submit", async (event) => {
     complianceConfirmed: document.querySelector("#legal-compliance-confirmed").checked,
   };
   try {
-    const result = await localRequest("/api/admin/legal-settings", { method: "PUT", body: JSON.stringify(settings) });
+    let result;
+    if (useSupabase) {
+      const { error } = await client.from("store_legal_settings").upsert({
+        id: 1,
+        business_name: settings.businessName,
+        support_email: settings.supportEmail,
+        postal_address: settings.postalAddress,
+        shipping_policy: settings.shippingPolicy,
+        returns_policy: settings.returnsPolicy,
+        tax_disclosure: settings.taxDisclosure,
+        policy_date: settings.policyDate,
+        compliance_confirmed: settings.complianceConfirmed,
+        is_published: settings.complianceConfirmed,
+        updated_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      const response = await fetch("/api/paypal/config", { cache: "no-store" });
+      if (!response.ok) throw new Error("Seller details saved, but PayPal readiness could not be checked.");
+      const paypal = await response.json();
+      result = { checkoutReady: paypal.enabled, missingDetails: paypal.missingDetails };
+    } else {
+      result = await localRequest("/api/admin/legal-settings", { method: "PUT", body: JSON.stringify(settings) });
+    }
     setStatus(sellerSettingsStatus, result.checkoutReady
       ? "Seller settings saved. PayPal checkout is ready in the configured environment."
       : `Seller settings saved. PayPal checkout stays disabled: ${result.missingDetails.join(", ")}.`);
@@ -390,7 +440,7 @@ productForm.addEventListener("submit", async (event) => {
 async function initialize() {
   const supabaseLogin = document.querySelector("#login-form");
   if (useSupabase) {
-    sellerSettingsPanel.classList.add("admin-hidden");
+    sellerSettingsPanel.classList.remove("admin-hidden");
     localLoginForm.classList.add("admin-hidden");
     localSetupForm.classList.add("admin-hidden");
     supabaseLogin.classList.remove("admin-hidden");

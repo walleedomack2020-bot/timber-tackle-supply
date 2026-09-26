@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check app.js && node --check admin.js && node --check install.js && node --check legal.js"
+    "check": "node --check server.js && node --check app.js && node --check admin.js && node --check install.js && node --check legal.js && node --check functions/_utils/paypal.js && node --check functions/api/paypal/config.js && node --check functions/api/paypal/orders.js && node --check \"functions/api/paypal/orders/[orderId]/capture.js\"",
+    "test": "node --test"
   }
 }
