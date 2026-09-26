@@ -1,11 +1,12 @@
-const crypto = require("node:crypto");
-const fs = require("node:fs");
-const path = require("node:path");
-const http = require("node:http");
-const { promisify } = require("node:util");
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import http from "node:http";
+import { promisify } from "node:util";
+import { Buffer } from "node:buffer";
 
 const scrypt = promisify(crypto.scrypt);
-const root = __dirname;
+const root = new URL(".", import.meta.url).pathname;
 const dataDirectory = path.resolve(process.env.STORE_DATA_DIR || path.join(root, ".local-store"));
 const imageDirectory = path.join(dataDirectory, "images");
 const authFile = path.join(dataDirectory, "owner.json");
