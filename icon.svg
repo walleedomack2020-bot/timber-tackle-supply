@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#203c31"/>
+  <path d="M72 110h368v292H72z" rx="28" fill="#f3bd32" stroke="#f2efe6" stroke-width="16"/>
+  <path d="M104 142h304v228H104z" fill="none" stroke="#1c211b" stroke-width="8"/>
+  <text x="256" y="256" fill="#1c211b" font-family="Arial,sans-serif" font-size="56" font-weight="900" text-anchor="middle">NO</text>
+  <text x="256" y="320" fill="#1c211b" font-family="Arial,sans-serif" font-size="41" font-weight="900" text-anchor="middle">TRESPASSING</text>
+</svg>

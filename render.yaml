@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: timber-tackle-supply
+    runtime: node
+    plan: starter
+    region: ohio
+    buildCommand: node --check server.js && node --check admin.js && node --check app.js
+    startCommand: node server.js
+    healthCheckPath: /api/session
+    disk:
+      name: timber-tackle-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: STORE_DATA_DIR
+        value: /var/data
+      - key: OWNER_SETUP_KEY
+        sync: false

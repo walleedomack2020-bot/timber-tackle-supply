@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "name": "Timber & Tackle Supply",
+  "short_name": "Timber & Tackle",
+  "description": "Custom-moulded, American-made no-trespassing signs.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f2efe6",
+  "theme_color": "#203c31",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Owner Catalog",
+      "short_name": "Owner Catalog",
+      "url": "/admin.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Shop Signs",
+      "short_name": "Shop Signs",
+      "url": "/#shop",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

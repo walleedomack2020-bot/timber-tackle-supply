@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f2efe6">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <title>Owner Catalog | Timber & Tackle Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js" defer></script>
+    <script src="admin.js" defer></script>
+  </head>
+  <body class="admin-body">
+    <header class="site-header admin-header"><a class="wordmark" href="index.html"><span class="wordmark-stamp" aria-hidden="true">T<span>&</span>T</span><span class="wordmark-name">TIMBER <i>&</i> TACKLE <small>OWNER CATALOG</small></span></a><div class="admin-header-actions"><button class="admin-secondary install-button" id="install-app" type="button" hidden>INSTALL APP</button><a class="primary-link" href="index.html">VIEW STORE <span aria-hidden="true">↗</span></a></div></header>
+    <main class="admin-main">
+      <section class="admin-intro"><p class="eyebrow"><span class="eyebrow-rule"></span> PRIVATE STORE MANAGEMENT</p><h1>YOUR SHOP.<br>YOUR <span>CALL.</span></h1><p>Add new signs with a photo, keep product details current, and choose what appears in your storefront. Changes are restricted to your owner account.</p></section>
+      <div class="admin-status" id="setup-status" role="status"></div>
+      <section class="admin-panel admin-login" id="login-panel"><h2 id="login-title">OWNER SIGN-IN</h2><p id="login-copy">Sign in to manage your private product catalog.</p><form id="login-form" class="admin-hidden"><input id="owner-email" type="email" autocomplete="email" placeholder="you@example.com" aria-label="Owner email" required><button class="admin-primary" type="submit">SEND SIGN-IN LINK</button></form><form id="local-login-form" class="admin-hidden"><label class="admin-field" for="local-login-name">Login name<input id="local-login-name" name="username" type="text" autocomplete="username" value="owner" readonly></label><label class="admin-field" for="local-password">Owner password<input id="local-password" name="password" type="password" autocomplete="current-password" required></label><button class="admin-primary" type="submit">SIGN IN</button></form><form id="local-setup-form" class="admin-hidden"><label class="admin-field admin-hidden" id="setup-key-field" for="owner-setup-key">One-time Render setup key<input id="owner-setup-key" type="password" autocomplete="off"></label><label class="admin-field" for="setup-login-name">Login name<input id="setup-login-name" name="username" type="text" autocomplete="username" value="owner" readonly></label><label class="admin-field" for="setup-password">Create owner password<input id="setup-password" name="new-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label><label class="admin-field" for="confirm-password">Confirm password<input id="confirm-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label><p class="admin-help">Choose at least 12 characters. Save this login in your browser’s password manager when prompted.</p><button class="admin-primary" type="submit">CREATE OWNER LOGIN</button></form><div class="admin-status" id="login-status" role="status" aria-live="polite"></div><div class="admin-help" id="login-help">Your local catalog and product photos stay in this project’s ignored data folder.</div></section>
+      <section class="admin-hidden" id="dashboard">
+        <div class="owner-bar"><span>SIGNED IN AS <strong id="owner-label"></strong></span><button class="admin-secondary" id="sign-out" type="button">SIGN OUT</button></div>
+        <section class="admin-panel" aria-labelledby="editor-title"><h2 id="editor-title">ADD A PRODUCT</h2><p>Add a sign to the public catalog or update a product you already listed.</p>
+          <form class="admin-form" id="product-form">
+            <div class="admin-field"><label for="product-name">Product name</label><input id="product-name" name="name" maxlength="80" placeholder="No Trespassing · Private Land" required></div>
+            <div class="admin-field"><label for="product-price">Price (USD)</label><input id="product-price" name="price" type="number" min="0.01" max="99999" step="0.01" placeholder="18.00" required></div>
+            <div class="admin-field admin-field-wide"><label for="product-description">Product details</label><textarea id="product-description" name="description" maxlength="500" placeholder="Describe the material, size, and what makes this sign right for the job." required></textarea></div>
+            <div class="admin-field admin-field-wide"><span class="upload-label">Product photo</span><div class="upload-box"><input id="product-image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif"><p>Choose a photo from your device. JPG, PNG, WebP, or AVIF · Max 8 MB. Leave blank to keep the current photo.</p><img class="upload-preview admin-hidden" id="image-preview" alt="Selected product photo preview"></div></div>
+            <label class="publish-toggle"><input id="product-published" type="checkbox" checked> Show this product in my public storefront</label>
+            <div class="admin-field-wide admin-actions"><button class="admin-primary" id="save-product" type="submit">SAVE PRODUCT</button><button class="admin-secondary admin-hidden" id="cancel-edit" type="button">CANCEL EDIT</button><span class="admin-status" id="product-status" role="status" aria-live="polite"></span></div>
+          </form>
+        </section>
+        <section class="admin-list" aria-labelledby="products-title"><div class="admin-list-heading"><h2 id="products-title">YOUR PRODUCTS</h2><span id="product-count"></span></div><div class="admin-product-list" id="product-list"></div></section>
+      </section>
+    </main>
+    <footer class="site-footer"><a class="footer-brand" href="index.html">TIMBER <i>&</i> TACKLE <span>SUPPLY CO.</span></a><span>OWNER ACCESS · PRIVATE CATALOG</span><span>PLASTIC SIGNS · MADE & PRINTED IN MICHIGAN</span></footer>
+  </body>
+</html>

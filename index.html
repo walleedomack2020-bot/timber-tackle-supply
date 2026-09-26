@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f2efe6">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <meta name="description" content="Custom-moulded plastic no-trespassing signs, made and printed in Michigan. Make your boundary clear with Timber & Tackle Supply.">
+    <title>No Trespassing Signs, Made in Michigan | Timber & Tackle Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="announcement"><span>MADE HERE. MEANT TO HOLD UP.</span><span>CUSTOM-MOULDED PLASTIC · MADE & PRINTED IN MICHIGAN</span></div>
+    <header class="site-header">
+      <a class="wordmark" href="#top" aria-label="Timber and Tackle Supply home"><span class="wordmark-stamp" aria-hidden="true">T<span>&</span>T</span><span class="wordmark-name">TIMBER <i>&</i> TACKLE <small>SUPPLY CO. · MICHIGAN</small></span></a>
+      <nav class="main-nav" aria-label="Main navigation"><a href="#shop">The sign</a><a href="#catalog">Shop all</a><a href="#built-here">Built here</a></nav>
+      <button class="bag-button" id="open-bag" type="button" aria-label="Open shopping bag">BAG <span id="bag-count" class="bag-count">0</span></button>
+    </header>
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-rule"></span> LAND · HUNTING · PRIVATE PROPERTY</p>
+          <h1 id="hero-title">YOUR LAND.<br>YOUR <span>LINE.</span></h1>
+          <p class="hero-lede">Every sign is made and printed right here in Michigan from custom-moulded plastic.</p>
+          <a class="primary-link" href="#shop">BUY YOUR SIGN <span aria-hidden="true">↘</span></a>
+          <div class="hero-proof"><span class="proof-mark" aria-hidden="true">★</span><span>MICHIGAN-MADE<br><b>FROM PELLET TO SIGN!</b></span><span class="proof-divider"></span><span>BUILT FOR<br><b>THE LONG HAUL</b></span></div>
+        </div>
+        <div class="hero-visual" role="img" aria-label="A safety yellow no trespassing sign at the edge of wooded land">
+          <div class="visual-caption"><span>01 / BOUNDARY SERIES</span><span>FIELD TESTED DESIGN</span></div><div class="trees trees-back" aria-hidden="true"></div><div class="ground" aria-hidden="true"></div><div class="sign-post" aria-hidden="true"></div>
+          <div class="product-sign" aria-hidden="true"><strong>NO TRESPASSING</strong><span class="sign-rivet rivet-one"></span><span class="sign-rivet rivet-two"></span><span class="sign-rivet rivet-three"></span><span class="sign-rivet rivet-four"></span></div>
+          <div class="visual-note"><span>01</span> WEATHER-READY CUSTOM-MOULDED PLASTIC</div>
+        </div>
+      </section>
+      <div class="ticker" aria-label="Made and printed in Michigan"><span>MADE & PRINTED IN MICHIGAN</span><i aria-hidden="true">✳</i><span>BUILT FOR OUTDOORS</span><i aria-hidden="true">✳</i><span>YOUR LAND. YOUR LINE.</span><i aria-hidden="true">✳</i><span>MADE & PRINTED IN MICHIGAN</span></div>
+
+      <section class="shop-section" id="shop" aria-labelledby="shop-title">
+        <div class="section-heading"><p class="eyebrow">THE BOUNDARY SERIES <span>—</span> NO. 001</p><h2 id="shop-title">SHOP THE <span>SERIES.</span></h2><p>NO TRESPASSING · 12 × 18 IN · ONE FIXED SIZE</p></div>
+        <div class="builder">
+          <div class="preview-stage"><div class="preview-label"><span>SIGN NO. 001 · LIVE PREVIEW</span><span>12 × 18 IN</span></div><div class="preview-sign" id="preview-sign" data-color="yellow"><strong>NO TRESPASSING</strong></div><p class="preview-caption">Custom-moulded plastic. Made and printed in Michigan.</p></div>
+          <form class="builder-controls" id="sign-form">
+            <div class="control-heading"><span>CHOOSE YOUR COLOR</span><span class="step-number">01—01</span></div>
+            <fieldset class="control-group"><legend>Choose a color</legend><div class="color-options" role="group" aria-label="Sign color"><button class="color-option" type="button" data-color="yellow" aria-label="Safety yellow" aria-pressed="true"><span class="swatch swatch-yellow"></span>SAFETY YELLOW</button><button class="color-option" type="button" data-color="white" aria-label="White" aria-pressed="false"><span class="swatch swatch-white"></span>WHITE</button><button class="color-option" type="button" data-color="orange" aria-label="Safety orange" aria-pressed="false"><span class="swatch swatch-orange"></span>SAFETY ORANGE</button></div></fieldset>
+            <div class="builder-foot"><p class="price"><span>YOUR SIGN</span><strong id="sign-price">$18</strong></p><button class="add-button" type="submit">ADD TO BAG <span aria-hidden="true">+</span></button></div>
+            <p class="made-note"><span aria-hidden="true">✳</span> MADE & PRINTED IN MICHIGAN</p>
+          </form>
+        </div>
+      </section>
+
+      <section class="proof-section" aria-labelledby="proof-title"><div class="catalog-heading"><div><p class="eyebrow">BOUNDARY SERIES · NO. 001</p><h2 id="proof-title">ONE MESSAGE.<br><span>THREE FINISHES.</span></h2></div><p>NO TRESPASSING<br>CUSTOM-MOULDED PLASTIC · MADE & PRINTED IN MICHIGAN</p></div><div class="proof-grid"><figure class="proof-card"><div class="proof-scene proof-woods" role="img" aria-label="Yellow no trespassing sign mockup against a woodland background"><div class="proof-board proof-yellow">NO TRESPASSING</div></div><figcaption><span>01</span> SAFETY YELLOW</figcaption></figure><figure class="proof-card"><div class="proof-scene proof-fence" role="img" aria-label="White no trespassing sign mockup beside a fence"><div class="proof-board proof-white">NO TRESPASSING</div></div><figcaption><span>02</span> CLEAN WHITE</figcaption></figure><figure class="proof-card"><div class="proof-scene proof-field" role="img" aria-label="Orange no trespassing sign mockup on private land"><div class="proof-board proof-orange">NO TRESPASSING</div></div><figcaption><span>03</span> SAFETY ORANGE</figcaption></figure></div></section>
+      <section class="catalog-section" id="catalog" aria-labelledby="catalog-title"><div class="catalog-heading"><div><p class="eyebrow">FROM OUR SHOP</p><h2 id="catalog-title">MORE WAYS TO <span>MARK YOUR LAND.</span></h2></div><p>Custom-moulded plastic signs, made and printed in Michigan.</p></div><p class="catalog-status" id="catalog-status" role="status">Our sign shop is getting ready.</p><div class="catalog-grid" id="catalog-grid"></div></section>
+      <section class="origin-section" id="built-here" aria-labelledby="origin-title"><div class="origin-mark" aria-label="Michigan-made">MI<span>✳</span></div><div class="origin-copy"><p class="eyebrow">MADE CLOSE TO HOME</p><h2 id="origin-title">MADE HERE.<br><span>STAYS HERE.</span></h2><p>Every sign is made and printed in Michigan from custom-moulded plastic. From pellet to finished sign, the process stays close to home.</p></div><div class="origin-specs"><div><span>01</span><p><b>CUSTOM-MOULDED PLASTIC</b><br>Weather-ready signs shaped for your message.</p></div><div><span>02</span><p><b>HIGH-VISIBILITY PRINT</b><br>Bold lettering you can spot where it counts.</p></div><div><span>03</span><p><b>MADE & PRINTED IN MICHIGAN</b><br>Made from pellet to finished sign.</p></div></div></section>
+      <section class="closing" aria-label="Shop Michigan-made signs"><p>GOOD LAND. CLEAR LINES.</p><a href="#shop">BUY YOUR SIGN <span aria-hidden="true">↑</span></a></section>
+    </main>
+    <footer class="site-footer"><a class="footer-brand" href="#top">TIMBER <i>&</i> TACKLE <span>SUPPLY CO.</span></a><a href="admin.html">OWNER LOGIN</a><span>PLASTIC SIGNS · MADE & PRINTED IN MICHIGAN</span><span>© <span id="year"></span> TIMBER & TACKLE SUPPLY</span></footer>
+
+    <dialog class="bag-dialog" id="bag-dialog" aria-labelledby="bag-title"><div class="bag-topline"><span>YOUR ORDER</span><button id="close-bag" class="close-button" type="button" aria-label="Close shopping bag">CLOSE <span aria-hidden="true">×</span></button></div><h2 id="bag-title">THE BAG<span id="dialog-count"> (0)</span></h2><div class="bag-items" id="bag-items"></div><div class="bag-empty" id="bag-empty"><span aria-hidden="true">↳</span><p>No signs in your bag yet.<br>Find one for your land.</p><button id="shop-now" type="button">SHOP SIGNS</button></div><div class="bag-summary" id="bag-summary" hidden><div class="subtotal"><span>SUBTOTAL</span><strong id="bag-subtotal">$0</strong></div><p>Shipping and any applicable taxes are calculated at checkout.</p><button class="checkout-button" id="request-order" type="button">COPY ORDER SUMMARY</button><p class="checkout-note">Payment and shipping setup is not connected yet.</p></div></dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
