@@ -31,7 +31,7 @@ function setupFetch(t, { legal = legalSettings } = {}) {
   const calls = [];
   let savedOrder;
   let paypalCreateBody;
-  globalThis.fetch = async (input, init = {}) => {
+  globalThis.fetch = (input, init = {}) => {
     const url = new URL(String(input));
     const method = init.method || "GET";
     calls.push({ url, method, init });

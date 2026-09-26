@@ -8,14 +8,14 @@ const fields = {
   returnsPolicy: document.querySelector("#legal-returns-policy"),
 };
 const emailLinks = [...document.querySelectorAll(".legal-email-link")];
-const config = window.STORE_CONFIG;
-const useSupabase = window.supabase && config && !config.url.includes("YOUR_") && !config.anonKey.includes("YOUR_");
+const config = globalThis.STORE_CONFIG;
+const useSupabase = globalThis.supabase && config && !config.url.includes("YOUR_") && !config.anonKey.includes("YOUR_");
 
 async function loadStorePolicies() {
   try {
     let details;
     if (useSupabase) {
-      const client = window.supabase.createClient(config.url, config.anonKey);
+      const client = globalThis.supabase.createClient(config.url, config.anonKey);
       const { data, error } = await client.from("store_legal_settings")
         .select("business_name,support_email,postal_address,shipping_policy,returns_policy,tax_disclosure,policy_date")
         .eq("id", 1)

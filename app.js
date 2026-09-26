@@ -160,12 +160,12 @@ async function configurePaypal() {
     script.async = true;
     script.addEventListener("error", () => setCheckoutStatus("PayPal checkout could not load. Please try again later.", true), { once: true });
     script.addEventListener("load", async () => {
-      if (!window.paypal) {
+      if (!globalThis.paypal) {
         setCheckoutStatus("PayPal checkout could not load. Please try again later.", true);
         return;
       }
       try {
-        await window.paypal.Buttons({
+        await globalThis.paypal.Buttons({
           style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
           createOrder: async () => {
             if (!document.querySelector("#accept-store-terms").checked) {
@@ -229,12 +229,12 @@ async function configurePaypal() {
 async function loadProducts() {
   const status = document.querySelector("#catalog-status");
   const grid = document.querySelector("#catalog-grid");
-  const config = window.STORE_CONFIG;
-  const useSupabase = window.supabase && config && !config.url.includes("YOUR_") && !config.anonKey.includes("YOUR_");
+  const config = globalThis.STORE_CONFIG;
+  const useSupabase = globalThis.supabase && config && !config.url.includes("YOUR_") && !config.anonKey.includes("YOUR_");
   let client;
   let data;
   if (useSupabase) {
-    client = window.supabase.createClient(config.url, config.anonKey);
+    client = globalThis.supabase.createClient(config.url, config.anonKey);
     const result = await client.from("products").select("id,name,description,price_cents,image_path").eq("is_published", true).order("created_at", { ascending: false });
     if (result.error) {
       status.textContent = "Our sign catalog is temporarily unavailable.";

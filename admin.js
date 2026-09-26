@@ -1,5 +1,5 @@
-const config = window.STORE_CONFIG;
-const useSupabase = window.supabase && config && !config.url.includes("YOUR_") && !config.anonKey.includes("YOUR_");
+const config = globalThis.STORE_CONFIG;
+const useSupabase = globalThis.supabase && config && !config.url.includes("YOUR_") && !config.anonKey.includes("YOUR_");
 const setupStatus = document.querySelector("#setup-status");
 const loginPanel = document.querySelector("#login-panel");
 const loginStatus = document.querySelector("#login-status");
@@ -267,7 +267,7 @@ async function startEdit(product) {
 }
 
 async function deleteProduct(product) {
-  if (!window.confirm(`Delete “${product.name}” from your shop?`)) return;
+  if (!globalThis.confirm(`Delete “${product.name}” from your shop?`)) return;
   try {
     if (useSupabase) {
       const { error } = await client.from("products").delete().eq("id", product.id);
@@ -296,7 +296,7 @@ document.querySelector("#login-form").addEventListener("submit", async (event) =
   event.preventDefault();
   setStatus(loginStatus, "Sending secure sign-in link…");
   const email = document.querySelector("#owner-email").value.trim();
-  const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}`, shouldCreateUser: false } });
+  const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: `${globalThis.location.origin}${globalThis.location.pathname}`, shouldCreateUser: false } });
   setStatus(loginStatus, error ? error.message : "Check your email for a secure sign-in link.", Boolean(error));
 });
 
@@ -445,7 +445,7 @@ async function initialize() {
     localSetupForm.classList.add("admin-hidden");
     supabaseLogin.classList.remove("admin-hidden");
     document.querySelector("#login-help").textContent = "Editing is restricted to the verified owner email in your Supabase project.";
-    client = window.supabase.createClient(config.url, config.anonKey);
+    client = globalThis.supabase.createClient(config.url, config.anonKey);
     client.auth.onAuthStateChange((_event, session) => syncSupabaseAuth(session));
     const { data } = await client.auth.getSession();
     syncSupabaseAuth(data.session);

@@ -2,11 +2,11 @@ const installButton = document.querySelector("#install-app");
 const installStatus = document.querySelector("#install-status");
 let installPrompt;
 
-if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) {
+if (globalThis.matchMedia("(display-mode: standalone)").matches || globalThis.navigator.standalone === true) {
   installButton.hidden = true;
 }
 
-window.addEventListener("beforeinstallprompt", (event) => {
+globalThis.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
   installPrompt = event;
 });
@@ -23,7 +23,7 @@ installButton.addEventListener("click", async () => {
   installPrompt = undefined;
 });
 
-window.addEventListener("appinstalled", () => {
+globalThis.addEventListener("appinstalled", () => {
   installPrompt = undefined;
   installButton.hidden = true;
   installStatus.textContent = "Timber & Tackle is installed and ready to launch.";
