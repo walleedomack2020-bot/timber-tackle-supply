@@ -9,30 +9,16 @@ const productStatus = document.querySelector("#product-status");
 const productList = document.querySelector("#product-list");
 const imageInput = document.querySelector("#product-image");
 const imagePreview = document.querySelector("#image-preview");
+const uploadBox = document.querySelector("#upload-box");
 const localLoginForm = document.querySelector("#local-login-form");
 const localSetupForm = document.querySelector("#local-setup-form");
+const sellerSettingsPanel = document.querySelector("#seller-settings-panel");
+const sellerSettingsForm = document.querySelector("#seller-settings-form");
+const sellerSettingsStatus = document.querySelector("#seller-settings-status");
+const sellerPaypalStatus = document.querySelector("#seller-paypal-status");
 let client;
 let previewUrl;
 let editingProduct;
-let installPrompt;
-
-const installButton = document.querySelector("#install-app");
-window.addEventListener("beforeinstallprompt", (event) => {
-  event.preventDefault();
-  installPrompt = event;
-  installButton.hidden = false;
-});
-installButton.addEventListener("click", async () => {
-  if (!installPrompt) return;
-  await installPrompt.prompt();
-  await installPrompt.userChoice;
-  installPrompt = undefined;
-  installButton.hidden = true;
-});
-window.addEventListener("appinstalled", () => {
-  installButton.hidden = true;
-  installPrompt = undefined;
-});
 
 function setStatus(element, message, isError = false) {
   element.textContent = message;
@@ -68,7 +54,53 @@ function showDashboard(ownerName) {
   dashboard.classList.remove("admin-hidden");
   document.querySelector("#owner-label").textContent = ownerName;
   loadOwnerProducts();
+  if (!useSupabase) loadSellerSettings();
 }
+
+async function loadSellerSettings() {
+  try {
+    const settings = await localRequest("/api/admin/legal-settings");
+    document.querySelector("#legal-business-name").value = settings.businessName;
+    document.querySelector("#legal-support-email").value = settings.supportEmail;
+    document.querySelector("#legal-postal-address").value = settings.postalAddress;
+    document.querySelector("#legal-shipping-policy").value = settings.shippingPolicy;
+    document.querySelector("#legal-returns-policy").value = settings.returnsPolicy;
+    document.querySelector("#legal-tax-disclosure").value = settings.taxDisclosure;
+    document.querySelector("#legal-policy-date").value = settings.policyDate;
+    document.querySelector("#legal-compliance-confirmed").checked = settings.complianceConfirmed;
+    sellerPaypalStatus.textContent = `PayPal Client ID: ${settings.paypalClientIdConfigured ? "configured" : "missing"} · PayPal Secret: ${settings.paypalClientSecretConfigured ? "configured" : "missing"}. Credentials are managed in the server environment, not in this form.`;
+  } catch (error) {
+    setStatus(sellerSettingsStatus, `Could not load seller settings: ${error.message}`, true);
+  }
+}
+
+sellerSettingsForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const saveButton = document.querySelector("#save-seller-settings");
+  saveButton.disabled = true;
+  setStatus(sellerSettingsStatus, "Saving seller settings…");
+  const settings = {
+    businessName: document.querySelector("#legal-business-name").value.trim(),
+    supportEmail: document.querySelector("#legal-support-email").value.trim(),
+    postalAddress: document.querySelector("#legal-postal-address").value.trim(),
+    shippingPolicy: document.querySelector("#legal-shipping-policy").value.trim(),
+    returnsPolicy: document.querySelector("#legal-returns-policy").value.trim(),
+    taxDisclosure: document.querySelector("#legal-tax-disclosure").value.trim(),
+    policyDate: document.querySelector("#legal-policy-date").value,
+    complianceConfirmed: document.querySelector("#legal-compliance-confirmed").checked,
+  };
+  try {
+    const result = await localRequest("/api/admin/legal-settings", { method: "PUT", body: JSON.stringify(settings) });
+    setStatus(sellerSettingsStatus, result.checkoutReady
+      ? "Seller settings saved. PayPal checkout is ready in the configured environment."
+      : `Seller settings saved. PayPal checkout stays disabled: ${result.missingDetails.join(", ")}.`);
+    await loadSellerSettings();
+  } catch (error) {
+    setStatus(sellerSettingsStatus, `Seller settings could not be saved: ${error.message}`, true);
+  } finally {
+    saveButton.disabled = false;
+  }
+});
 
 function syncSupabaseAuth(session) {
   if (session?.user) showDashboard(session.user.email);
@@ -262,13 +294,39 @@ document.querySelector("#sign-out").addEventListener("click", async () => {
 
 document.querySelector("#cancel-edit").addEventListener("click", resetForm);
 
-imageInput.addEventListener("change", () => {
-  const file = imageInput.files[0];
+function previewImage(file) {
   if (!file) return;
   if (previewUrl) URL.revokeObjectURL(previewUrl);
   previewUrl = URL.createObjectURL(file);
   imagePreview.src = previewUrl;
   imagePreview.classList.remove("admin-hidden");
+}
+
+imageInput.addEventListener("change", () => {
+  previewImage(imageInput.files[0]);
+});
+
+for (const eventName of ["dragenter", "dragover"]) {
+  uploadBox.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    uploadBox.classList.add("is-dragging");
+  });
+}
+
+for (const eventName of ["dragleave", "drop"]) {
+  uploadBox.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    uploadBox.classList.remove("is-dragging");
+  });
+}
+
+uploadBox.addEventListener("drop", (event) => {
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  const files = new DataTransfer();
+  files.items.add(file);
+  imageInput.files = files.files;
+  previewImage(file);
 });
 
 productForm.addEventListener("submit", async (event) => {
@@ -332,6 +390,7 @@ productForm.addEventListener("submit", async (event) => {
 async function initialize() {
   const supabaseLogin = document.querySelector("#login-form");
   if (useSupabase) {
+    sellerSettingsPanel.classList.add("admin-hidden");
     localLoginForm.classList.add("admin-hidden");
     localSetupForm.classList.add("admin-hidden");
     supabaseLogin.classList.remove("admin-hidden");
@@ -344,6 +403,7 @@ async function initialize() {
   }
 
   supabaseLogin.classList.add("admin-hidden");
+  sellerSettingsPanel.classList.remove("admin-hidden");
   document.querySelector("#login-help").textContent = "Your local catalog and product photos stay in this project's ignored data folder.";
   try {
     const session = await localRequest("/api/session");

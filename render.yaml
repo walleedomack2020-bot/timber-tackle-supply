@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: starter
     region: ohio
-    buildCommand: node --check server.js && node --check admin.js && node --check app.js
+    buildCommand: node --check server.js && node --check admin.js && node --check app.js && node --check install.js && node --check legal.js
     startCommand: node server.js
     healthCheckPath: /api/session
     disk:
@@ -18,3 +18,27 @@ services:
         value: /var/data
       - key: OWNER_SETUP_KEY
         sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_SHIPPING_CENTS
+        value: "0"
+      - key: STORE_LEGAL_NAME
+        sync: false
+      - key: STORE_SUPPORT_EMAIL
+        sync: false
+      - key: STORE_POSTAL_ADDRESS
+        sync: false
+      - key: STORE_SHIPPING_POLICY
+        sync: false
+      - key: STORE_RETURNS_POLICY
+        sync: false
+      - key: STORE_TAX_DISCLOSURE
+        sync: false
+      - key: STORE_POLICY_EFFECTIVE_DATE
+        sync: false
+      - key: STORE_LIVE_COMPLIANCE_CONFIRMED
+        value: "false"

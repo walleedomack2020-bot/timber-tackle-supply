@@ -1,0 +1,12 @@
+{
+  "name": "timber-tackle-supply",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check app.js && node --check admin.js && node --check install.js && node --check legal.js"
+  }
+}

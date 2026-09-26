@@ -13,6 +13,8 @@ const signPrice = 18;
 let selectedColor = "yellow";
 let cart = loadCart();
 let toastTimeout;
+let paypalInitialized = false;
+let paypalCheckoutItemIds = [];
 
 function loadCart() {
   try {
@@ -106,9 +108,12 @@ for (const button of colorButtons) {
 
 document.querySelector("#sign-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  addToCart({ message: "NO TRESPASSING", size: "12 × 18 in", color: selectedColor, price: signPrice });
+  addToCart({ product_id: "boundary-sign", message: "NO TRESPASSING", size: "12 × 18 in", color: selectedColor, price: signPrice });
 });
-document.querySelector("#open-bag").addEventListener("click", () => bagDialog.showModal());
+document.querySelector("#open-bag").addEventListener("click", () => {
+  bagDialog.showModal();
+  if (cart.length) configurePaypal();
+});
 document.querySelector("#close-bag").addEventListener("click", () => bagDialog.close());
 document.querySelector("#shop-now").addEventListener("click", () => {
   bagDialog.close();
@@ -117,16 +122,108 @@ document.querySelector("#shop-now").addEventListener("click", () => {
 bagDialog.addEventListener("click", (event) => {
   if (event.target === bagDialog) bagDialog.close();
 });
-document.querySelector("#request-order").addEventListener("click", async () => {
-  const lines = cart.map((item) => `${item.quantity} × ${item.message} — ${item.size ? `${item.size}, ` : ""}${item.color}, ${formatPrice(item.price * item.quantity)}`);
-  lines.push(`Subtotal: ${formatPrice(cart.reduce((total, item) => total + item.price * item.quantity, 0))}`);
+function setCheckoutStatus(message, isError = false) {
+  const status = document.querySelector("#checkout-note");
+  status.textContent = message;
+  status.dataset.error = String(isError);
+}
+
+function paypalCartItems() {
+  return cart.map((item) => {
+    const productId = item.product_id || (item.message === "NO TRESPASSING" ? "boundary-sign" : null);
+    if (!productId) throw new Error("Remove and re-add older catalog items before checking out.");
+    return {
+      product_id: productId,
+      quantity: item.quantity,
+      color: productId === "boundary-sign" ? item.color.toLowerCase() : undefined,
+    };
+  });
+}
+
+async function configurePaypal() {
+  if (paypalInitialized) return;
+  paypalInitialized = true;
   try {
-    await navigator.clipboard.writeText(`Timber & Tackle Supply order request\n${lines.join("\n")}`);
-    showToast("Order summary copied. Payment is not connected yet.");
+    const response = await fetch("/api/paypal/config", { cache: "no-store" });
+    if (!response.ok) throw new Error("PayPal settings could not be loaded.");
+    const config = await response.json();
+    if (!config.enabled) {
+      setCheckoutStatus(config.missingDetails?.length
+        ? "Checkout is unavailable until the owner publishes a legal business name, mailing address, support email, shipping and return policies, tax disclosure, and compliance confirmation."
+        : "PayPal is not connected yet. The owner must add PayPal app credentials before taking payments.", true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(config.clientId)}&currency=USD&intent=capture&components=buttons`;
+    script.async = true;
+    script.addEventListener("error", () => setCheckoutStatus("PayPal checkout could not load. Please try again later.", true), { once: true });
+    script.addEventListener("load", async () => {
+      if (!window.paypal) {
+        setCheckoutStatus("PayPal checkout could not load. Please try again later.", true);
+        return;
+      }
+      try {
+        await window.paypal.Buttons({
+          style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
+          createOrder: async () => {
+            if (!document.querySelector("#accept-store-terms").checked) {
+              throw new Error("Please agree to the store terms and review its privacy notice before continuing.");
+            }
+            let items;
+            try {
+              items = paypalCartItems();
+            } catch (error) {
+              setCheckoutStatus(error.message, true);
+              throw error;
+            }
+            const result = await fetch("/api/paypal/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ items }),
+            });
+            const order = await result.json();
+            if (!result.ok) throw new Error(order.error || "PayPal could not start checkout.");
+            paypalCheckoutItemIds = cart.map((item) => item.id);
+            return order.id;
+          },
+          onInit: (_data, actions) => {
+            const consent = document.querySelector("#accept-store-terms");
+            const syncConsent = () => consent.checked ? actions.enable() : actions.disable();
+            syncConsent();
+            consent.addEventListener("change", syncConsent);
+          },
+          onApprove: async (details) => {
+            const result = await fetch(`/api/paypal/orders/${encodeURIComponent(details.orderID)}/capture`, { method: "POST" });
+            const capture = await result.json();
+            if (!result.ok || capture.status !== "COMPLETED") throw new Error(capture.error || "PayPal could not confirm payment.");
+            cart = cart.filter((item) => !paypalCheckoutItemIds.includes(item.id));
+            paypalCheckoutItemIds = [];
+            saveCart();
+            renderCart();
+            bagDialog.close();
+            showToast("Payment received. Your PayPal receipt has the order details.");
+          },
+          onCancel: () => setCheckoutStatus("Checkout was cancelled. No payment was confirmed."),
+          onError: () => {
+            setCheckoutStatus("PayPal could not complete checkout. If PayPal shows a receipt, the payment was received.", true);
+            showToast("PayPal checkout needs attention.");
+          },
+        }).render("#paypal-button-container");
+        const shipping = config.shippingCents > 0
+          ? ` A ${formatPrice(config.shippingCents)} flat shipping fee will be added.`
+          : " No online shipping fee is configured.";
+        const mode = config.environment === "sandbox" ? " PayPal sandbox test mode is active." : "";
+        setCheckoutStatus(`PayPal checkout is ready.${shipping} Applicable taxes are not included.${mode}`);
+      } catch {
+        setCheckoutStatus("PayPal checkout could not initialize. Please try again later.", true);
+      }
+    }, { once: true });
+    document.head.append(script);
   } catch {
-    showToast("Copy unavailable. Please note the items in your bag.");
+    setCheckoutStatus("PayPal checkout is currently unavailable. Please try again later.", true);
   }
-});
+}
 
 async function loadProducts() {
   const status = document.querySelector("#catalog-status");
@@ -200,7 +297,7 @@ async function loadProducts() {
     add.className = "catalog-add";
     add.type = "button";
     add.textContent = "ADD TO BAG +";
-    add.addEventListener("click", () => addToCart({ message: product.name, size: "Standard", color: "As shown", price: product.price_cents / 100 }));
+    add.addEventListener("click", () => addToCart({ product_id: product.id, message: product.name, size: "Standard", color: "As shown", price: product.price_cents / 100 }));
     copy.append(top, description, add);
     card.append(image, copy);
     grid.append(card);
